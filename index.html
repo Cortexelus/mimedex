@@ -1,0 +1,236 @@
+<html>
+<head>
+<style>
+body, html{
+	font-family:  courier new, monospace;
+	margin:  0px;
+	padding:  0px;
+}
+body {
+	background: url(repeat.png) repeat;
+    background-size: 50%;
+}
+#bg{
+	position: absolute;
+	top:  0px;
+	left:  0px;
+	width:  100%;    
+	background: url(bg.png);
+    background-repeat: repeat-x;
+    background-size: 50%;
+    height: 1920px;
+    z-index: -100000;
+}
+#bg img{
+	width:  100%;
+}
+
+#title{
+	margin: auto;
+	text-align:  center;
+	margin-top: 20px;
+	zoom:  2;
+}
+#title-top{
+	color:  white;
+	font-size: 60px;
+    font-weight: bold;
+    margin-bottom: -12px;
+}
+#title-bot{
+	color:  #ff9393;
+	font-size: 23px;
+    font-weight: bold;
+}
+.toplist{
+	padding:  30px;
+	font-size:  40px;
+	color:  white;
+	font-weight:  bold;
+}
+</style>
+<style>
+.columns{
+	width:  400px;
+}
+.ui-table-search{
+	width:  100%;
+	margin:  0px;
+	background-color:  black;
+	border:  0px solid  #ff9393;
+	padding:  10px;
+	font-family:  courier new, monospace;
+	color:  #ff9393;
+	font-size:  18px;
+	border-radius:  0px;
+}
+.ui-table{
+	width:  100%;
+	background-color:  #0008;
+}
+.ui-table td, th{
+	color:  white;
+	padding:  4px;
+	    word-break: break-all;
+}
+.ui-table th{
+	cursor:  pointer;
+}
+.ui-table th:nth-child(1){
+	width:  100px;
+	text-align:  right;
+}
+.ui-table th:nth-child(2){
+	width:  300px;
+	text-align:  left;
+}
+
+
+.ui-table td:nth-child(1){
+	width:  100px;
+	text-align:  right;
+	color:  ff9393;
+	overflow: hidden;
+}
+.ui-table td:nth-child(2){
+	width:  300px;
+}
+/*
+.ui-table-rows-even{
+	background-color: black;
+}.ui-table-rows-odd{
+	background-color: black;
+}*/
+
+.ui-table-footer{
+	display:  none;
+}
+.ui-table tr:hover{
+	background-color:  #fff2;
+	cursor:  pointer;
+}
+
+#example1{
+	float: left;
+	width:  400px;
+
+}
+#ordinals_list{
+   width: 800px;
+  margin-left: 400px;
+  background-color: #0008;
+  padding-bottom:  30px;
+}
+.ord{
+	padding-top:  30px;
+	padding-left:  30px;
+	position: relative;
+
+}
+
+.ord-rank{
+	color:  white;
+	font-size:  40px;
+	font-weight:  bold;
+}
+.ord-num{
+	color:  white;
+	font-weight: bold;
+	padding-top: 0px;
+	margin-left: 80px;
+	margin-top:  -40px;
+}
+.ord-link a, .ord-link a:hover{
+	color: #ff9393;
+	margin-left: 80px;
+
+}
+</style>
+
+<body>
+<div id="title">
+	<div id="title-top">mimedex</div>
+	<div id="title-bot">ordinals mimetypes</div>
+</div>
+
+
+<div id="example1"></div>
+
+<div id="ordinals_list"></div>
+
+
+<div id="bg"></div>
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="js/jquery.columns.min.js"></script>
+
+<script>
+
+
+let inscriptions = []
+$.ajax({
+    url:'inscriptions-1023926.json',
+    dataType: 'json', 
+    success: function(json) { 
+        console.log("inscriptions success");
+        inscriptions = json;
+        let type = "audio/wav"
+        list_ordinals(type, get_ordinals(type))
+
+    }
+ }); 	
+
+let types = []
+$.ajax({
+    url:'types.json',
+    dataType: 'json', 
+    success: function(json) { 
+        console.log("types success");
+        $('#example1').columns({
+        	data:json,
+        	size: 10000000,
+	  			showRows: [10]
+	  		})
+     }
+    
+});
+
+function get_ordinals(type){
+	let ords = []
+	if(inscriptions){
+		for(let i in inscriptions){
+			let o = inscriptions[i];
+			if(o["content_type"]==type){
+				ords.push(o);
+			}
+		}
+	}
+	return ords;
+}
+function list_ordinals(type, ords){
+	let html = "<div class='toplist'>"+type+"</div>"
+	let max = 10;
+	let count = 0;
+	for(let o in ords){
+		let ord = ords[o]
+		let id = ord["id"]
+		let num = ord["num"]
+		let type = ord["content_type"]
+		html += "<div class='ord'>" + 
+		"<div class='ord-rank'>#"+ (parseInt(o)+1) +"</div>" + 
+
+		"<div class='ord-num'>ordinal #"+ num +"</div>" + 
+		"<div class='ord-link'><a href='https://ordinals.com/inscription/"+id+"' target='ordwindow'>"+id+"</a></div>" + 
+		//"<iframe sandbox=allow-scripts scrolling=no loading=lazy src='https://ordinals.com//preview/"+id+"'></iframe>"+
+		"</div>"
+		count+=1
+		if(count>=max){
+			break
+		}
+	}
+	$("#ordinals_list").html(html)
+
+}
+
+</script>
